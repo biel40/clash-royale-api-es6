@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
+        crossorigin="anonymous">
+
+    <title> Clash Royale API </title>
+
+    <style>
+
+        img:hover{
+            cursor: pointer;
+        }
+    
+    </style>
+</head>
+
+<body>
+    <header class="container-fluid float-left mb-3 bg-dark">
+
+        <a href="index.html"><img class="col-1 float-left mt-4 mb-4" src="https://vignette.wikia.nocookie.net/clashroyale/images/4/41/Team_Battle_Icon.png/revision/latest?cb=20170312193759"
+        alt="Icono de Clash Royale" > <a href="index.html"></a>
+
+        <h1 class=" float-left text-primary col-6 mt-4 mb-4 display-4"> <a href="index.html"> CLASH ROYALE API  </a></h1>
+
+        <ul class="nav nav-pills nav-fill float-right col-4 mb-5 mt-5">
+            <li class="nav-item">
+                <a class="nav-link active" href="index.html"> Clans </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="cartes.html"> Cartes </a>
+            </li>
+        </ul>
+    </header>
+
+    <main class="col-12 float-left">
+
+        <img  id="img" src="https://img.icons8.com/windows/1600/long-arrow-left.png" alt="goback" width="30px" height="30px"> Enrere </a>
+
+        <h4 id="loadingP" class="ml-3 text-danger"> Carregant... </h4>
+
+        <div class="float-left col-2">
+            <h3> Tag: </h3>
+            <p id="tagP" class="text-primary" style="font-size: 1.5em;"></p>
+        </div>
+
+        <div class="float-left col-2">
+            <h3> Nom: </h3>
+            <p id="nameP" class="text-primary" style="font-size: 1.5em;"></p>
+        </div>
+
+        <div class="float-left col-6">
+            <h3> Descripció: </h3>
+            <p id="descriptionP" style="font-size: 1.5em;"></p>
+        </div>
+
+        <div class="float-left col-2">
+            <h3> Localització: </h3>
+            <p id="countryP" style="font-size: 1.5em;"></p>
+        </div>
+
+        <div class="float-left col-12">
+
+            <h3 class="">Membres: </h3>
+
+            <div id="taula" class="">
+
+            </div>
+
+        </div>
+
+    </main>
+
+    <script type="module">
+
+        import {
+            getClanByName
+        } from './../serveis/clanService.js';
+
+        import {
+            getClanByTag
+        } from './../serveis/clanService.js';
+
+        let a = document.getElementById("img");
+        a.addEventListener("click", function(){
+            window.history.go(-1);
+        });
+
+
+        getInfo();
+
+        async function getInfo() {
+            let urlSelf = new URL(window.location.href);
+            let clanTag = urlSelf.searchParams.get('tag'); 
+
+            let clanArray = await getClanByTag(clanTag);
+            let clan = clanArray;
+
+            paintClanInfo(clan);
+
+        }
+
+        function paintClanInfo(clan) {
+
+            document.getElementById("loadingP").innerText = "";
+
+            let tagP = document.getElementById("tagP");
+            let nameP =  document.getElementById("nameP");
+            let descriptionP = document.getElementById("descriptionP");
+            let countryP = document.getElementById("countryP");
+            let membersSelect = document.getElementById("membersSelect");
+
+            tagP.innerText = clan.tag;
+            nameP.innerText = clan.name;
+            descriptionP.innerText = clan.description;
+            countryP.innerText = clan.location;
+            
+            pintarTaula(clan.memberList);
+
+        }
+        
+
+        async function pintarTaula(arrayDeJugadors) {
+
+        let table = '<table class="table table-light">';
+
+        table += '<thead class="mt-2">';
+        table += '<tr>';
+        table += '<th class="pb-2" > Tag </th>';
+        table += '<th class="pb-2" > Nom </th>';
+        table += '<th class="pb-2" > Rol </th>'
+        table += '<th class="pb-2" > Trofeus <img src="https://royaleapi.com/static/img/ui/trophy.png" width="20px" height="20px" > </th>';
+        table += '<th class="pb-2" > Donacions <img src="https://royaleapi.com/static/img/ui/cards.png" width="20px" height="20px" > </th>';
+        table += '<th class="pb-2" > Donacions Rebudes <img src="https://royaleapi.com/static/img/ui/cards.png" width="20px" height="20px" > </th>';
+        table += '</tr>';
+        table += '</thead>';
+
+        arrayDeJugadors.forEach(function (jugador) {
+
+            table += '<tr>';
+            table += '<td> <a href="playerDetails.html?tag=' + jugador.tag.replace('#', '') + '\" </a>' + jugador.tag + '</td>'
+            table += '<td> <a href="playerDetails.html?tag=' + jugador.tag.replace('#', '') + '\" </a>' + jugador.name + '</td>'
+            table += '<td>' + jugador.role + '</td>';
+            table += '<td>' + jugador.trophies + '</td>';
+            table += '<td>' + jugador.donations + '</td>';
+            table += '<td>' + jugador.donationsReceived + '</td>';
+            table += '</tr>'
+        });
+
+        document.querySelector('#taula').innerHTML = table;
+
+    }
+
+
+    </script>
+
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+        crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+        crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+        crossorigin="anonymous"></script>
+</body>
+
+</html>
